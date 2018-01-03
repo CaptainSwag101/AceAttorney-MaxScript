@@ -38,7 +38,8 @@ fn hexAsString hx =
 (
     num = (bit.intashex hx) as string
     str = ""
-    pos = num.count;for i = 1 to (num.count / 2) do
+    pos = num.count
+    for i = 1 to (num.count / 2) do
     (
         str += bit.intaschar (execute ("0x" + (num[(pos - 1)] + num[(pos)])))
         pos -= 2
@@ -120,7 +121,7 @@ for a = 1 to BoneCount do
     c31 = ReadFloat f; c32 = ReadFloat f; c33 = ReadFloat f; c34 = ReadFloat f
     c41 = ReadFloat f; c42 = ReadFloat f; c43 = ReadFloat f; c44 = ReadFloat f
 
-    tfm = matrix3 [c11,c12,c13] [c21,c22,c23] [c31,c32,c33] ([c41,c42,c43]*100)
+    tfm = matrix3 [c11,c12,c13] [c21,c22,c23] [c31,c32,c33] ([c41,c42,c43] * 100)
 
     newBone = bonesys.createbone    \
             tfm.row4      \
@@ -153,581 +154,25 @@ if BoneCount > 0 then
 fseek f 0x100 #seek_cur
 Print ("Bone Section End @ 0x" + ((bit.intAsHex(ftell f)) as string))
 Pos = ftell f
-
-BoneMapArray01 = #()
-BoneMapArray02 = #()
-BoneMapArray03 = #()
-BoneMapArray04 = #()
-BoneMapArray05 = #()
-BoneMapArray06 = #()
-BoneMapArray07 = #()
-BoneMapArray08 = #()
-BoneMapArray09 = #()
-BoneMapArray10 = #()
-
 fseek f Pos #seek_set
-if UsedBoneCount > 10 then
+
+BoneMapArrays = #()
+
+for i = 1 to UsedBoneCount do
 (
-    errorMsg = "Error: Bone Map count is greater than 8! This may occur if the model you are loading is extremely complex. Your model will continue to load, but it is highly recommended that you contact the script author for a fix before continuing, or you may encounter rigging issues. Please provide the MaxScript Listener log and the associated .mod file to Reddit user CaptainSwag101."
-    messagebox (errorMsg)
-    Print (errorMsg)
-    UsedBoneCount = 10
-)
-if UsedBoneCount == 1 then
-(
-    UBoneCount = 1
-    for i = 1 to UBoneCount do
+    BoneMapCount = ReadLong f #unsigned
+    BMap = #()
+    for j = 1 to BoneMapCount do
     (
-        BoneMapCount01 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount01 do
-        (
-            BMap01 = (ReadByte f #unsigned + 1)
-            append BoneMapArray01 BMap01
-        )
-        Stride01 = (24 - BoneMapCount01)
-        fseek f Stride01 #seek_cur
+        val = (ReadByte f #unsigned + 1)
+        append BMap val
     )
+    append BoneMapArrays BMap
+    
+    Stride = (24 - BoneMapCount)
+    fseek f Stride #seek_cur
 )
-if UsedBoneCount == 2 then
-(
-    UBoneCount = 1
-    for i = 1 to UBoneCount do
-    (
-        BoneMapCount01 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount01 do
-        (
-            BMap01 = (ReadByte f #unsigned + 1)
-            append BoneMapArray01 BMap01
-        )
-        Stride01 = (24 - BoneMapCount01)
-        fseek f Stride01 #seek_cur
-        
-        BoneMapCount02 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount02 do
-        (
-            BMap02 = (ReadByte f #unsigned + 1)
-            append BoneMapArray02 BMap02
-        )
-        Stride02 = (24 - BoneMapCount02)
-        fseek f Stride02 #seek_cur
-    )
-)
-if UsedBoneCount == 3 then
-(
-    UBoneCount = 1
-    for i = 1 to UBoneCount do
-    (
-        BoneMapCount01 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount01 do
-        (
-            BMap01 = (ReadByte f #unsigned + 1)
-            append BoneMapArray01 BMap01
-        )
-        Stride01 = (24 - BoneMapCount01)
-        fseek f Stride01 #seek_cur
-        
-        BoneMapCount02 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount02 do
-        (
-            BMap02 = (ReadByte f #unsigned + 1)
-            append BoneMapArray02 BMap02
-        )
-        Stride02 = (24 - BoneMapCount02)
-        fseek f Stride02 #seek_cur
-        
-        BoneMapCount03 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount03 do
-        (
-            BMap03 = (ReadByte f #unsigned + 1)
-            append BoneMapArray03 BMap03
-        )
-        Stride03 = (24 - BoneMapCount03)
-        fseek f Stride03 #seek_cur
-    )
-)
-if UsedBoneCount == 4 then
-(
-    UBoneCount = 1
-    for i = 1 to UBoneCount do
-    (
-        BoneMapCount01 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount01 do
-        (
-            BMap01 = (ReadByte f #unsigned + 1)
-            append BoneMapArray01 BMap01
-        )
-        Stride01 = (24 - BoneMapCount01)
-        fseek f Stride01 #seek_cur
-        
-        BoneMapCount02 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount02 do
-        (
-            BMap02 = (ReadByte f #unsigned + 1)
-            append BoneMapArray02 BMap02
-        )
-        Stride02 = (24 - BoneMapCount02)
-        fseek f Stride02 #seek_cur
-        
-        BoneMapCount03 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount03 do
-        (
-            BMap03 = (ReadByte f #unsigned + 1)
-            append BoneMapArray03 BMap03
-        )
-        Stride03 = (24 - BoneMapCount03)
-        fseek f Stride03 #seek_cur
-        
-        BoneMapCount04 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount04 do
-        (
-            BMap04 = (ReadByte f #unsigned + 1)
-            append BoneMapArray04 BMap04
-        )
-        Stride04 = (24 - BoneMapCount04)
-        fseek f Stride04 #seek_cur
-    )
-)
-if UsedBoneCount == 5 then
-(
-    UBoneCount = 1
-    for i = 1 to UBoneCount do
-    (
-        BoneMapCount01 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount01 do
-        (
-            BMap01 = (ReadByte f #unsigned + 1)
-            append BoneMapArray01 BMap01
-        )
-        Stride01 = (24 - BoneMapCount01)
-        fseek f Stride01 #seek_cur
-        
-        BoneMapCount02 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount02 do
-        (
-            BMap02 = (ReadByte f #unsigned + 1)
-            append BoneMapArray02 BMap02
-        )
-        Stride02 = (24 - BoneMapCount02)
-        fseek f Stride02 #seek_cur
-        
-        BoneMapCount03 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount03 do
-        (
-            BMap03 = (ReadByte f #unsigned + 1)
-            append BoneMapArray03 BMap03
-        )
-        Stride03 = (24 - BoneMapCount03)
-        fseek f Stride03 #seek_cur
-        
-        BoneMapCount04 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount04 do
-        (
-            BMap04 = (ReadByte f #unsigned + 1)
-            append BoneMapArray04 BMap04
-        )
-        Stride04 = (24 - BoneMapCount04)
-        fseek f Stride04 #seek_cur
-        
-        BoneMapCount05 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount05 do
-        (
-            BMap05 = (ReadByte f #unsigned + 1)
-            append BoneMapArray05 BMap05
-        )
-        Stride05 = (24 - BoneMapCount05)
-        fseek f Stride05 #seek_cur
-    )
-)
-if UsedBoneCount == 6 then
-(
-    UBoneCount = 1
-    for i = 1 to UBoneCount do
-    (
-        BoneMapCount01 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount01 do
-        (
-            BMap01 = (ReadByte f #unsigned + 1)
-            append BoneMapArray01 BMap01
-        )
-        Stride01 = (24 - BoneMapCount01)
-        fseek f Stride01 #seek_cur
-        
-        BoneMapCount02 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount02 do
-        (
-            BMap02 = (ReadByte f #unsigned + 1)
-            append BoneMapArray02 BMap02
-        )
-        Stride02 = (24 - BoneMapCount02)
-        fseek f Stride02 #seek_cur
-        
-        BoneMapCount03 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount03 do
-        (
-            BMap03 = (ReadByte f #unsigned + 1)
-            append BoneMapArray03 BMap03
-        )
-        Stride03 = (24 - BoneMapCount03)
-        fseek f Stride03 #seek_cur
-        
-        BoneMapCount04 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount04 do
-        (
-            BMap04 = (ReadByte f #unsigned + 1)
-            append BoneMapArray04 BMap04
-        )
-        Stride04 = (24 - BoneMapCount04)
-        fseek f Stride04 #seek_cur
-        
-        BoneMapCount05 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount05 do
-        (
-            BMap05 = (ReadByte f #unsigned + 1)
-            append BoneMapArray05 BMap05
-        )
-        Stride05 = (24 - BoneMapCount05)
-        fseek f Stride05 #seek_cur
-        
-        BoneMapCount06 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount06 do
-        (
-            BMap06 = (ReadByte f #unsigned + 1)
-            append BoneMapArray06 BMap06
-        )
-        Stride06 = (24 - BoneMapCount06)
-        fseek f Stride06 #seek_cur
-    )
-)
-if UsedBoneCount == 7 then
-(
-    UBoneCount = 1
-    for i = 1 to UBoneCount do
-    (
-        BoneMapCount01 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount01 do
-        (
-            BMap01 = (ReadByte f #unsigned + 1)
-            append BoneMapArray01 BMap01
-        )
-        Stride01 = (24 - BoneMapCount01)
-        fseek f Stride01 #seek_cur
-        
-        BoneMapCount02 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount02 do
-        (
-            BMap02 = (ReadByte f #unsigned + 1)
-            append BoneMapArray02 BMap02
-        )
-        Stride02 = (24 - BoneMapCount02)
-        fseek f Stride02 #seek_cur
-        
-        BoneMapCount03 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount03 do
-        (
-            BMap03 = (ReadByte f #unsigned + 1)
-            append BoneMapArray03 BMap03
-        )
-        Stride03 = (24 - BoneMapCount03)
-        fseek f Stride03 #seek_cur
-        
-        BoneMapCount04 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount04 do
-        (
-            BMap04 = (ReadByte f #unsigned + 1)
-            append BoneMapArray04 BMap04
-        )
-        Stride04 = (24 - BoneMapCount04)
-        fseek f Stride04 #seek_cur
-        
-        BoneMapCount05 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount05 do
-        (
-            BMap05 = (ReadByte f #unsigned + 1)
-            append BoneMapArray05 BMap05
-        )
-        Stride05 = (24 - BoneMapCount05)
-        fseek f Stride05 #seek_cur
-        
-        BoneMapCount06 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount06 do
-        (
-            BMap06 = (ReadByte f #unsigned + 1)
-            append BoneMapArray06 BMap06
-        )
-        Stride06 = (24 - BoneMapCount06)
-        fseek f Stride06 #seek_cur
-        
-        BoneMapCount07 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount07 do
-        (
-            BMap07 = (ReadByte f #unsigned + 1)
-            append BoneMapArray07 BMap07
-        )
-        Stride07 = (24 - BoneMapCount07)
-        fseek f Stride07 #seek_cur
-    )
-)
-if UsedBoneCount == 8 then
-(
-    UBoneCount = 1
-    for i = 1 to UBoneCount do
-    (
-        BoneMapCount01 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount01 do
-        (
-            BMap01 = (ReadByte f #unsigned + 1)
-            append BoneMapArray01 BMap01
-        )
-        Stride01 = (24 - BoneMapCount01)
-        fseek f Stride01 #seek_cur
-        
-        BoneMapCount02 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount02 do
-        (
-            BMap02 = (ReadByte f #unsigned + 1)
-            append BoneMapArray02 BMap02
-        )
-        Stride02 = (24 - BoneMapCount02)
-        fseek f Stride02 #seek_cur
-        
-        BoneMapCount03 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount03 do
-        (
-            BMap03 = (ReadByte f #unsigned + 1)
-            append BoneMapArray03 BMap03
-        )
-        Stride03 = (24 - BoneMapCount03)
-        fseek f Stride03 #seek_cur
-        
-        BoneMapCount04 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount04 do
-        (
-            BMap04 = (ReadByte f #unsigned + 1)
-            append BoneMapArray04 BMap04
-        )
-        Stride04 = (24 - BoneMapCount04)
-        fseek f Stride04 #seek_cur
-        
-        BoneMapCount05 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount05 do
-        (
-            BMap05 = (ReadByte f #unsigned + 1)
-            append BoneMapArray05 BMap05
-        )
-        Stride05 = (24 - BoneMapCount05)
-        fseek f Stride05 #seek_cur
-        
-        BoneMapCount06 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount06 do
-        (
-            BMap06 = (ReadByte f #unsigned + 1)
-            append BoneMapArray06 BMap06
-        )
-        Stride06 = (24 - BoneMapCount06)
-        fseek f Stride06 #seek_cur
-        
-        BoneMapCount07 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount07 do
-        (
-            BMap07 = (ReadByte f #unsigned + 1)
-            append BoneMapArray07 BMap07
-        )
-        Stride07 = (24 - BoneMapCount07)
-        fseek f Stride07 #seek_cur
-        
-        BoneMapCount08 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount08 do
-        (
-            BMap08 = (ReadByte f #unsigned + 1)
-            append BoneMapArray08 BMap08
-        )
-        Stride08 = (24 - BoneMapCount08)
-        fseek f Stride08 #seek_cur
-    )
-)
-if UsedBoneCount == 9 then
-(
-    UBoneCount = 1
-    for i = 1 to UBoneCount do
-    (
-        BoneMapCount01 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount01 do
-        (
-            BMap01 = (ReadByte f #unsigned + 1)
-            append BoneMapArray01 BMap01
-        )
-        Stride01 = (24 - BoneMapCount01)
-        fseek f Stride01 #seek_cur
-        
-        BoneMapCount02 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount02 do
-        (
-            BMap02 = (ReadByte f #unsigned + 1)
-            append BoneMapArray02 BMap02
-        )
-        Stride02 = (24 - BoneMapCount02)
-        fseek f Stride02 #seek_cur
-        
-        BoneMapCount03 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount03 do
-        (
-            BMap03 = (ReadByte f #unsigned + 1)
-            append BoneMapArray03 BMap03
-        )
-        Stride03 = (24 - BoneMapCount03)
-        fseek f Stride03 #seek_cur
-        
-        BoneMapCount04 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount04 do
-        (
-            BMap04 = (ReadByte f #unsigned + 1)
-            append BoneMapArray04 BMap04
-        )
-        Stride04 = (24 - BoneMapCount04)
-        fseek f Stride04 #seek_cur
-        
-        BoneMapCount05 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount05 do
-        (
-            BMap05 = (ReadByte f #unsigned + 1)
-            append BoneMapArray05 BMap05
-        )
-        Stride05 = (24 - BoneMapCount05)
-        fseek f Stride05 #seek_cur
-        
-        BoneMapCount06 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount06 do
-        (
-            BMap06 = (ReadByte f #unsigned + 1)
-            append BoneMapArray06 BMap06
-        )
-        Stride06 = (24 - BoneMapCount06)
-        fseek f Stride06 #seek_cur
-        
-        BoneMapCount07 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount07 do
-        (
-            BMap07 = (ReadByte f #unsigned + 1)
-            append BoneMapArray07 BMap07
-        )
-        Stride07 = (24 - BoneMapCount07)
-        fseek f Stride07 #seek_cur
-        
-        BoneMapCount08 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount08 do
-        (
-            BMap08 = (ReadByte f #unsigned + 1)
-            append BoneMapArray08 BMap08
-        )
-        Stride08 = (24 - BoneMapCount08)
-        fseek f Stride08 #seek_cur
-        
-        BoneMapCount09 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount09 do
-        (
-            BMap09 = (ReadByte f #unsigned + 1)
-            append BoneMapArray09 BMap09
-        )
-        Stride09 = (24 - BoneMapCount09)
-        fseek f Stride09 #seek_cur
-    )
-)
-if UsedBoneCount == 10 then
-(
-    UBoneCount = 1
-    for i = 1 to UBoneCount do
-    (
-        BoneMapCount01 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount01 do
-        (
-            BMap01 = (ReadByte f #unsigned + 1)
-            append BoneMapArray01 BMap01
-        )
-        Stride01 = (24 - BoneMapCount01)
-        fseek f Stride01 #seek_cur
-        
-        BoneMapCount02 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount02 do
-        (
-            BMap02 = (ReadByte f #unsigned + 1)
-            append BoneMapArray02 BMap02
-        )
-        Stride02 = (24 - BoneMapCount02)
-        fseek f Stride02 #seek_cur
-        
-        BoneMapCount03 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount03 do
-        (
-            BMap03 = (ReadByte f #unsigned + 1)
-            append BoneMapArray03 BMap03
-        )
-        Stride03 = (24 - BoneMapCount03)
-        fseek f Stride03 #seek_cur
-        
-        BoneMapCount04 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount04 do
-        (
-            BMap04 = (ReadByte f #unsigned + 1)
-            append BoneMapArray04 BMap04
-        )
-        Stride04 = (24 - BoneMapCount04)
-        fseek f Stride04 #seek_cur
-        
-        BoneMapCount05 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount05 do
-        (
-            BMap05 = (ReadByte f #unsigned + 1)
-            append BoneMapArray05 BMap05
-        )
-        Stride05 = (24 - BoneMapCount05)
-        fseek f Stride05 #seek_cur
-        
-        BoneMapCount06 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount06 do
-        (
-            BMap06 = (ReadByte f #unsigned + 1)
-            append BoneMapArray06 BMap06
-        )
-        Stride06 = (24 - BoneMapCount06)
-        fseek f Stride06 #seek_cur
-        
-        BoneMapCount07 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount07 do
-        (
-            BMap07 = (ReadByte f #unsigned + 1)
-            append BoneMapArray07 BMap07
-        )
-        Stride07 = (24 - BoneMapCount07)
-        fseek f Stride07 #seek_cur
-        
-        BoneMapCount08 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount08 do
-        (
-            BMap08 = (ReadByte f #unsigned + 1)
-            append BoneMapArray08 BMap08
-        )
-        Stride08 = (24 - BoneMapCount08)
-        fseek f Stride08 #seek_cur
-        
-        BoneMapCount09 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount09 do
-        (
-            BMap09 = (ReadByte f #unsigned + 1)
-            append BoneMapArray09 BMap09
-        )
-        Stride09 = (24 - BoneMapCount09)
-        fseek f Stride09 #seek_cur
-        
-        BoneMapCount10 = ReadLong f #unsigned
-        for i = 1 to BoneMapCount10 do
-        (
-            BMap10 = (ReadByte f #unsigned + 1)
-            append BoneMapArray10 BMap10
-        )
-        Stride10 = (24 - BoneMapCount10)
-        fseek f Stride10 #seek_cur
-    )
-)
+
 Print ("Bone Map End @ 0x" + ((bit.intAsHex(ftell f)) as string))
 
 Mesh_Info = #()
@@ -742,8 +187,8 @@ for i = 1 to MeshCount do
     vertCount = ReadShort f #unsigned
     unk2 = ReadLong f
     unk3 = ReadShort f
-    vSize = ReadByte f
-    vType = ReadByte f
+    vSize = ReadByte f #unsigned
+    vType = ReadByte f #unsigned
     vStart = ReadLong f
     unk5 = ReadLong f
     unk6 = ReadLong f
@@ -1101,94 +546,14 @@ for i = 1 to MeshCount do
         select msh
         skinMod = skin ()
         addModifier msh skinMod
-        
-        if Mesh_Info[i].MeshId == 1 then
+
+        for c = 1 to BoneMapArrays[Mesh_Info[i].MeshId].count do
         (
-            for c = 1 to BoneMapArray01.count do
-            (
-                maxbone = BNArr[(BoneMapArray01[c])]
-                if c != BoneMapArray01.count then
-                    skinOps.addBone skinMod maxbone 0
-                else
-                    skinOps.addBone skinMod maxbone 1
-            )
-        )
-        if Mesh_Info[i].MeshId == 2 then
-        (
-            for c = 1 to BoneMapArray02.count do
-            (
-                maxbone = BNArr[(BoneMapArray02[c])]
-                if c != BoneMapArray02.count then
-                    skinOps.addBone skinMod maxbone 0
-                else
-                    skinOps.addBone skinMod maxbone 1
-            )
-        )
-        if Mesh_Info[i].MeshId == 3 then
-        (
-            for c = 1 to BoneMapArray03.count do
-            (
-                maxbone = BNArr[(BoneMapArray03[c])]
-                if c != BoneMapArray03.count then
-                    skinOps.addBone skinMod maxbone 0
-                else
-                    skinOps.addBone skinMod maxbone 1
-            )
-        )
-        if Mesh_Info[i].MeshId == 4 then
-        (
-            for c = 1 to BoneMapArray04.count do
-            (
-                maxbone = BNArr[(BoneMapArray04[c])]
-                if c != BoneMapArray04.count then
-                    skinOps.addBone skinMod maxbone 0
-                else
-                    skinOps.addBone skinMod maxbone 1
-            )
-        )
-        if Mesh_Info[i].MeshId == 5 then
-        (
-            for c = 1 to BoneMapArray05.count do
-            (
-                maxbone = BNArr[(BoneMapArray05[c])]
-                if c != BoneMapArray05.count then
-                    skinOps.addBone skinMod maxbone 0
-                else
-                    skinOps.addBone skinMod maxbone 1
-            )
-        )
-        if Mesh_Info[i].MeshId == 6 then
-        (
-            for c = 1 to BoneMapArray06.count do
-            (
-                maxbone = BNArr[(BoneMapArray06[c])]
-                if c != BoneMapArray06.count then
-                    skinOps.addBone skinMod maxbone 0
-                else
-                    skinOps.addBone skinMod maxbone 1
-            )
-        )
-        if Mesh_Info[i].MeshId == 7 then
-        (
-            for c = 1 to BoneMapArray07.count do
-            (
-                maxbone = BNArr[(BoneMapArray07[c])]
-                if c != BoneMapArray07.count then
-                    skinOps.addBone skinMod maxbone 0
-                else
-                    skinOps.addBone skinMod maxbone 1
-            )
-        )
-        if Mesh_Info[i].MeshId == 8 then
-        (
-            for c = 1 to BoneMapArray08.count do
-            (
-                maxbone = BNArr[(BoneMapArray08[c])]
-                if c != BoneMapArray08.count then
-                    skinOps.addBone skinMod maxbone 0
-                else
-                    skinOps.addBone skinMod maxbone 1
-            )
+            maxbone = BNArr[(BoneMapArrays[Mesh_Info[i].MeshId][c])]
+            if c != BoneMapArrays[Mesh_Info[i].MeshId].count then
+                skinOps.addBone skinMod maxbone 0
+            else
+                skinOps.addBone skinMod maxbone 1
         )
         
         modPanel.setCurrentObject skinMod
@@ -1211,9 +576,9 @@ for i = 1 to MeshCount do
     )
     catch
     (
-        format "Error!!!\n%\n" (getCurrentException())
+        format "Error!!!\n%\n%\n" (getCurrentException()) (getCurrentExceptionStackTrace())
     )
-    format "Mesh %\n\tMesh Start: %\n\tFace Start: %\n\tVertex Type: %\n\n" i ("0x" + ((bit.intAsHex(vertOffset))as string)) ("0x" + ((bit.intAsHex(faceStart)) as string)) ((((Mesh_Info[i].VType)) as string))
+    format "Mesh %\n\tMesh Start: %\n\tFace Start: %\n\tVertex Type: %\n\n" i ("0x" + ((bit.intAsHex(vertOffset)) as string)) ("0x" + ((bit.intAsHex(faceStart)) as string)) ((((Mesh_Info[i].VType)) as string))
 )
 
 fclose f
