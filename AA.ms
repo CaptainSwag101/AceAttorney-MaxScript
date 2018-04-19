@@ -58,31 +58,30 @@ clearlistener()
 
 GlobalSizeMultiplier = 100
 
-fseek f 0x6 #seek_set
+fseek f 0x06 #seek_set
 BoneCount = ReadShort f #unsigned
 MeshCount = ReadShort f #unsigned
-fseek f 0xc #seek_set
-VertexCount = ReadLong f #unsigned
-fseek f 0x18 #seek_set
-VertSize = ReadLong f
-Long05 = ReadLong f
-Long06 = ReadLong f
-UsedBoneCount = ReadLong f #unsigned
-BoneOff = ReadLong f
-Print ("Bone Offset @ 0x" + ((bit.intAsHex(ftell f)) as string))
 Print ("Mesh Count: " + (MeshCount as string))
-MatCount2 = ReadShort f #unsigned
-fseek f 0x30 #seek_set
-MatOff = ReadLong f
+fseek f 0x0C #seek_set
+VertCount = ReadLong f #unsigned
+fseek f 0x18 #seek_set
+VertSize = ReadLong f #unsigned
+Long05 = ReadLong f #unsigned
+MatCount = ReadLong f #unsigned
+UsedBoneCount = ReadLong f #unsigned
+BoneOff = ReadLong f #unsigned
+Print ("Bone Offset @ 0x" + ((bit.intAsHex(ftell f)) as string))
+MatOff = ReadLong f #unsigned
+TexOff = ReadLong f #unsigned
 
-itemOff = ReadLong f
-Print ("Item Offset @ 0x" + (bit.intAsHex(itemOff) as string))
+ItemOff = ReadLong f #unsigned
+Print ("Item Offset @ 0x" + (bit.intAsHex(ItemOff) as string))
 
-vertOffset = ReadLong f
-Print ("Vert Offset @ 0x" + (bit.intAsHex(vertOffset) as string))
+VertOff = ReadLong f #unsigned
+Print ("Vert Offset @ 0x" + (bit.intAsHex(VertOff) as string))
 
-faceOffset = ReadLong f
-Print ("Face Offset @ 0x" + (bit.intAsHex(faceOffset) as string))
+FaceOff = ReadLong f #unsigned
+Print ("Face Offset @ 0x" + (bit.intAsHex(FaceOff) as string))
 
 fseek f BoneOff #seek_set
 Print ("Bone Section Start @ 0x" + ((bit.intAsHex(ftell f)) as string))
@@ -92,15 +91,15 @@ BoneParent = #()
 
 for a = 1 to BoneCount do
 (
-    boneId = ReadByte f #unsigned
+    boneId  = ReadByte f #unsigned
     append BoneParent (ReadByte f #unsigned)
     childId = ReadByte f #unsigned
-    unkId = ReadByte f #unsigned
-    floata = ReadFloat f
-    floatb = ReadFloat f
-    bonex  = ReadFloat f
-    boney  = ReadFloat f
-    bonez  = ReadFloat f
+    unkId   = ReadByte f #unsigned
+    floata  = ReadFloat f
+    floatb  = ReadFloat f
+    bonex   = ReadFloat f
+    boney   = ReadFloat f
+    bonez   = ReadFloat f
 )
 
 Print ("Bone Data End @ 0x" + ((bit.intAsHex(ftell f)) as string))
@@ -163,14 +162,23 @@ for i = 1 to UsedBoneCount do
     )
     append BoneMapArrays BMap
     
-    Stride = (24 - BoneMapCount)
-    fseek f Stride #seek_cur
+    stride = (24 - BoneMapCount)
+    fseek f stride #seek_cur
 )
+
 Print ("Bone Map End @ 0x" + ((bit.intAsHex(ftell f)) as string))
+
+fseek f TexOff #seek_set
+Print ("Texture Start @ 0x" + ((bit.intAsHex(ftell f)) as string))
+
+for i = 1 to MatCount do
+(
+
+)
 
 Mesh_Info = #()
 
-fseek f itemOff #seek_set
+fseek f ItemOff #seek_set
 Print ("Item Start @ 0x" + ((bit.intAsHex(ftell f)) as string))
 
 for i = 1 to MeshCount do
@@ -205,7 +213,7 @@ for i = 1 to MeshCount do
     UV_array = #()
     Weight_array = #()
 
-    fseek f vertOffset #seek_set
+    fseek f VertOff #seek_set
     Print ("Vertex Start @ 0x" + ((bit.intAsHex(ftell f)) as string))
 
     if Mesh_Info[i].VSize == 24 then
@@ -479,9 +487,9 @@ for i = 1 to MeshCount do
         messageBox("Error, unknown vertex size " + (Mesh_Info[i].VSize as string))
     )
 
-    vertOffset += (Mesh_Info[i].VertCount * Mesh_Info[i].VSize)
+    VertOff += (Mesh_Info[i].VertCount * Mesh_Info[i].VSize)
 
-    faceStart = (faceOffset + (Mesh_Info[i].FacePos * 2))
+    faceStart = (FaceOff + (Mesh_Info[i].FacePos * 2))
     fseek f faceStart #seek_set
 
     StartDirection = -1
@@ -562,7 +570,7 @@ for i = 1 to MeshCount do
     (
         format "Error!!!\n%\n%\n" (getCurrentException()) (getCurrentExceptionStackTrace())
     )
-    format "Mesh %\n\tMesh Start: %\n\tFace Start: %\n\tVertex Type: %\n\n" i ("0x" + ((bit.intAsHex(vertOffset)) as string)) ("0x" + ((bit.intAsHex(faceStart)) as string)) ((((Mesh_Info[i].VType)) as string))
+    format "Mesh %\n\tMesh Start: %\n\tFace Start: %\n\tVertex Type: %\n\n" i ("0x" + ((bit.intAsHex(VertOff)) as string)) ("0x" + ((bit.intAsHex(faceStart)) as string)) ((((Mesh_Info[i].VType)) as string))
 )
 
 fclose f
