@@ -10,8 +10,8 @@ fn readHalfFloat fstream =
 (
     hf = ReadShort fstream #unsigned
     sign = bit.get hf 16
-    exponent = (bit.shift (bit.and hf (bit.hexAsInt "7C00")) -10) as integer - 16
-    fraction = bit.and hf (bit.hexAsInt "03FF")
+    exponent = (bit.shift (bit.and hf 0x7C00) -10) as integer - 16
+    fraction = bit.and hf 0x03FF
 
     if sign == true then sign = 1 else sign = 0
 
@@ -51,7 +51,7 @@ struct weight_data
 
 struct Mesh_Info_Struct
 (
-    VertCount, VSize, VType, FacePos, FaceCount, VStart, MeshId
+    VCount, VSize, VType, FacePos, FaceCount, VStart, MeshId
 )
 
 clearlistener()
@@ -63,7 +63,7 @@ BoneCount = ReadShort f #unsigned
 MeshCount = ReadShort f #unsigned
 Print ("Mesh Count: " + (MeshCount as string))
 fseek f 0x0C #seek_set
-VertCount = ReadLong f #unsigned
+VCount = ReadLong f #unsigned
 fseek f 0x18 #seek_set
 VertSize = ReadLong f #unsigned
 Long05 = ReadLong f #unsigned
@@ -86,7 +86,7 @@ Print ("Face Offset @ 0x" + (bit.intAsHex(FaceOff) as string))
 fseek f BoneOff #seek_set
 Print ("Bone Section Start @ 0x" + ((bit.intAsHex(ftell f)) as string))
 
-BNArr = #()
+BoneArray = #()
 BoneParent = #()
 
 for a = 1 to BoneCount do
@@ -134,15 +134,15 @@ for a = 1 to BoneCount do
     newBone.rotation.controller = TCB_rotation ()
     
     if (BoneParent[a] != -1) then
-        newBone.parent = BNArr[(BoneParent[a]) + 1]
+        newBone.parent = BoneArray[(BoneParent[a]) + 1]
 
-    append BNArr newBone
+    append BoneArray newBone
 )
 
 if BoneCount > 0 then
 (
     rootRT = dummy name:"Main_Root" boxsize:[.1,.1,.1]
-    for b in BNArr where b.parent == undefined do b.parent = rootRT
+    for b in BoneArray where b.parent == undefined do b.parent = rootRT
     rootRT.transform = (matrix3 [1,0,0] [0,0,1] [0,-1,0] [0,0,0])
 )
 
@@ -153,16 +153,16 @@ BoneMapArrays = #()
 
 for i = 1 to UsedBoneCount do
 (
-    BoneMapCount = ReadLong f #unsigned
-    BMap = #()
-    for j = 1 to BoneMapCount do
+    bMapCount = ReadLong f #unsigned
+    bMap = #()
+    for j = 1 to bMapCount do
     (
         val = (ReadByte f #unsigned + 1)
-        append BMap val
+        append bMap val
     )
-    append BoneMapArrays BMap
+    append BoneMapArrays bMap
     
-    stride = (24 - BoneMapCount)
+    stride = (24 - bMapCount)
     fseek f stride #seek_cur
 )
 
@@ -171,21 +171,20 @@ Print ("Bone Map End @ 0x" + ((bit.intAsHex(ftell f)) as string))
 fseek f TexOff #seek_set
 Print ("Texture Start @ 0x" + ((bit.intAsHex(ftell f)) as string))
 
-for i = 1 to MatCount do
-(
-
-)
-
-Mesh_Info = #()
+--for i = 1 to MatCount do
+--(
+--)
 
 fseek f ItemOff #seek_set
 Print ("Item Start @ 0x" + ((bit.intAsHex(ftell f)) as string))
+
+Mesh_Info = #()
 
 for i = 1 to MeshCount do
 (
     getPos = ftell f + 48
     unk1 = ReadShort f
-    vertCount = ReadShort f #unsigned
+    vCount = ReadShort f #unsigned
     unk2 = ReadLong f
     unk3 = ReadShort f
     vSize = ReadByte f #unsigned
@@ -199,7 +198,7 @@ for i = 1 to MeshCount do
     NullB = ReadByte f #unsigned
     meshId = ReadByte f #unsigned + 1
     UBN = ReadByte f #unsigned
-    append Mesh_Info (Mesh_Info_Struct VertCount:vertCount VSize:vSize VType:vType FacePos:facePos FaceCount:faceCount VStart:vStart MeshId:meshId)
+    append Mesh_Info (Mesh_Info_Struct VCount:vCount VSize:vSize VType:vType FacePos:facePos FaceCount:faceCount VStart:vStart MeshId:meshId)
     fseek f getPos #seek_set
 )
 
@@ -218,7 +217,7 @@ for i = 1 to MeshCount do
 
     if Mesh_Info[i].VSize == 24 then
     (
-        for x = 1 to Mesh_Info[i].VertCount do
+        for x = 1 to Mesh_Info[i].VCount do
         (
             vx = ReadFloat f
             vy = ReadFloat f
@@ -229,13 +228,13 @@ for i = 1 to MeshCount do
             tu = ReadFloat f
             tv = ReadFloat f * -1
 
-            append vertArray ([vx,-vz,vy] / (2.55 * (101 - GlobalSizeMultiplier)))
+            append vertArray ([vx,-vz,vy] / (255.0 / GlobalSizeMultiplier))
             append UV_array [tu,tv,0]
         )
     )
     else if Mesh_Info[i].VSize == 28 then
     (
-        for x = 1 to Mesh_Info[i].VertCount do
+        for x = 1 to Mesh_Info[i].VCount do
         (
             vx = ReadFloat f
             vy = ReadFloat f
@@ -277,13 +276,13 @@ for i = 1 to MeshCount do
                 )
             )
             append Weight_array w
-            append vertArray ([vx,-vz,vy] / (2.55 * (101 - GlobalSizeMultiplier)))
+            append vertArray ([vx,-vz,vy] / (255.0 / GlobalSizeMultiplier))
             append UV_array [tu,tv,0]
         )
     )
     else if Mesh_Info[i].VSize == 32 then
     (
-        for x = 1 to Mesh_Info[i].VertCount do
+        for x = 1 to Mesh_Info[i].VCount do
         (
             vx = ReadFloat f
             vy = ReadFloat f
@@ -333,7 +332,7 @@ for i = 1 to MeshCount do
     )
     else if Mesh_Info[i].VSize == 36 then
     (
-        for x = 1 to Mesh_Info[i].VertCount do
+        for x = 1 to Mesh_Info[i].VCount do
         (
             vx = ReadFloat f
             vy = ReadFloat f
@@ -353,14 +352,16 @@ for i = 1 to MeshCount do
             p1 = ReadLong f
 
             bone3 = ReadByte f #unsigned
-            weight3 = ReadByte f #unsigned / 255.0
             bone4 = ReadByte f #unsigned
+            weight3 = ReadByte f #unsigned / 255.0
             weight4 = ReadByte f #unsigned / 255.0
 
             if weight1 == 1 then
+            (
                 weight2 = 0
-            weight3 = 0
-            weight4 = 0
+                weight3 = 0
+                weight4 = 0
+            )
 
             w = (weight_data boneIds:#() weights:#())
             maxweight = 0
@@ -407,7 +408,7 @@ for i = 1 to MeshCount do
     )
     else if Mesh_Info[i].VSize == 44 then
     (
-        for x = 1 to Mesh_Info[i].VertCount do
+        for x = 1 to Mesh_Info[i].VCount do
         (
             vx = ReadFloat f
             vy = ReadFloat f
@@ -427,17 +428,19 @@ for i = 1 to MeshCount do
             p1 = ReadLong f
 
             bone3 = ReadByte f #unsigned
-            weight3 = ReadByte f #unsigned / 255.0
             bone4 = ReadByte f #unsigned
+            weight3 = ReadByte f #unsigned / 255.0
             weight4 = ReadByte f #unsigned / 255.0
 
             p2 = ReadLong f
             p3 = ReadLong f
 
             if weight1 == 1 then
+            (
                 weight2 = 0
-            weight3 = 0
-            weight4 = 0
+                weight3 = 0
+                weight4 = 0
+            )
 
             w = (weight_data boneIds:#() weights:#())
             maxweight = 0
@@ -487,7 +490,7 @@ for i = 1 to MeshCount do
         messageBox("Error, unknown vertex size " + (Mesh_Info[i].VSize as string))
     )
 
-    VertOff += (Mesh_Info[i].VertCount * Mesh_Info[i].VSize)
+    VertOff += (Mesh_Info[i].VCount * Mesh_Info[i].VSize)
 
     faceStart = (FaceOff + (Mesh_Info[i].FacePos * 2))
     fseek f faceStart #seek_set
@@ -540,7 +543,7 @@ for i = 1 to MeshCount do
         (
             for c = 1 to BoneMapArrays[Mesh_Info[i].MeshId].count do
             (
-                maxbone = BNArr[(BoneMapArrays[Mesh_Info[i].MeshId][c])]
+                maxbone = BoneArray[(BoneMapArrays[Mesh_Info[i].MeshId][c])]
                 if c != BoneMapArrays[Mesh_Info[i].MeshId].count then
                     skinOps.addBone skinMod maxbone 0
                 else
@@ -548,7 +551,7 @@ for i = 1 to MeshCount do
             )
         
             modPanel.setCurrentObject skinMod
-            for x = 1 to Mesh_Info[i].VertCount do
+            for x = 1 to Mesh_Info[i].VCount do
             (
                 w = Weight_array[x]
                 bi = #()
