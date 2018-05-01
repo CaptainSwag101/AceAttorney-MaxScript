@@ -226,7 +226,7 @@ for i = 1 to MeshCount do
             p1 = ReadFloat f
 
             tu = ReadFloat f
-            tv = ReadFloat f * -1
+            tv = ReadFloat f
 
             append vertArray ([vx,-vz,vy] / (255.0 / GlobalSizeMultiplier))
             append UV_array [tu,tv,0]
@@ -243,7 +243,7 @@ for i = 1 to MeshCount do
             p1 = ReadFloat f
 
             tu = ReadFloat f
-            tv = ReadFloat f * -1
+            tv = ReadFloat f
 
             bone1 = ReadByte f #unsigned
             bone2 = ReadByte f #unsigned
@@ -291,7 +291,7 @@ for i = 1 to MeshCount do
             p1 = ReadFloat f
 
             tu = ReadFloat f
-            tv = ReadFloat f * -1
+            tv = ReadFloat f
 
             bone1 = ReadByte f #unsigned
             bone2 = ReadByte f #unsigned
@@ -342,7 +342,7 @@ for i = 1 to MeshCount do
             unk2 = (ReadShort f / 32767.00)
 
             tu = ReadFloat f
-            tv = ReadFloat f * -1
+            tv = ReadFloat f
 
             bone1 = ReadByte f #unsigned
             bone2 = ReadByte f #unsigned
@@ -418,7 +418,7 @@ for i = 1 to MeshCount do
             unk2 = (ReadShort f / 32767.00)
 
             tu = ReadFloat f
-            tv = ReadFloat f * -1
+            tv = ReadFloat f
 
             bone1 = ReadByte f #unsigned
             bone2 = ReadByte f #unsigned
