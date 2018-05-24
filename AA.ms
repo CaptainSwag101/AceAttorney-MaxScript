@@ -356,10 +356,19 @@ for i = 1 to MeshCount do
             weight3 = ReadByte f #unsigned / 255.0
             weight4 = ReadByte f #unsigned / 255.0
 
-            if weight1 == 1 then
+            if weight1 >= 1 then
             (
                 weight2 = 0
                 weight3 = 0
+                weight4 = 0
+            )
+            else if weight1 + weight2 >= 1 then
+            (
+                weight3 = 0
+                weight4 = 0
+            )
+            else if weight1 + weight2 + weight3 >= 1 then
+            (
                 weight4 = 0
             )
 
@@ -435,10 +444,19 @@ for i = 1 to MeshCount do
             p2 = ReadLong f
             p3 = ReadLong f
 
-            if weight1 == 1 then
+            if weight1 >= 1 then
             (
                 weight2 = 0
                 weight3 = 0
+                weight4 = 0
+            )
+            else if weight1 + weight2 >= 1 then
+            (
+                weight3 = 0
+                weight4 = 0
+            )
+            else if weight1 + weight2 + weight3 >= 1 then
+            (
                 weight4 = 0
             )
 
